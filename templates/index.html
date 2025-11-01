@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Cite Cleaner</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧹 HTML Cite Cleaner</h1>
+            <p class="subtitle">Remove citation markers from your HTML files</p>
+        </header>
+
+        <div class="info-box">
+            <h3>📌 What does this tool do?</h3>
+            <p>This tool removes the following citation markers from your HTML code:</p>
+            <ul>
+                <li><code>[cite: 124, 125]</code> - Citation markers with numbers</li>
+                <li><code>[cite_start]</code> - Citation start markers</li>
+            </ul>
+            <p>Your HTML structure remains completely intact!</p>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="switchMode('paste')" id="pasteBtn">
+                📝 Paste Code
+            </button>
+            <button class="mode-btn" onclick="switchMode('upload')" id="uploadBtn">
+                📤 Upload File
+            </button>
+        </div>
+
+        <!-- Paste Mode -->
+        <div id="pasteMode" class="paste-section">
+            <div class="input-section">
+                <h3>📋 Paste Your HTML Code</h3>
+                <textarea id="htmlInput" placeholder="Paste your HTML code here..."></textarea>
+                <button class="clean-btn" onclick="cleanPastedCode()">
+                    ✨ Clean HTML Code
+                </button>
+            </div>
+        </div>
+
+        <!-- Upload Mode -->
+        <div id="uploadMode" class="upload-section hidden">
+            <div class="upload-box" id="uploadBox">
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <h2>Upload Your HTML File</h2>
+                <p>Drag and drop or click to browse</p>
+                <input type="file" id="fileInput" accept=".html" style="display: none;">
+                <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                    Browse Files
+                </button>
+            </div>
+
+            <div id="fileInfo" class="file-info hidden">
+                <div class="file-details">
+                    <span class="file-name" id="fileName"></span>
+                    <button class="clear-btn" onclick="clearFile()">✕</button>
+                </div>
+                <button class="upload-btn" onclick="uploadFile()">
+                    <span id="uploadBtnText">Clean & Download</span>
+                    <div class="loader" id="loader" style="display: none;"></div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Visualization Results -->
+        <div id="visualization" class="visualization hidden">
+            <div class="viz-header">
+                <h2>🔍 Before & After Comparison</h2>
+                <div class="stats-mini">
+                    <span class="stat-badge" id="statBadge">
+                        <strong id="totalCitationsViz">0</strong> citations removed
+                    </span>
+                </div>
+            </div>
+            
+            <div class="comparison-container">
+                <div class="code-panel">
+                    <div class="panel-header before-header">
+                        <h3>❌ Before (With Citations)</h3>
+                        <span class="count-badge" id="beforeCount">0 citations</span>
+                    </div>
+                    <div class="code-display" id="beforeCode"></div>
+                </div>
+                
+                <div class="arrow-divider">
+                    <div class="arrow">→</div>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="panel-header after-header">
+                        <h3>✅ After (Cleaned)</h3>
+                        <span class="count-badge success" id="afterCount">Clean!</span>
+                    </div>
+                    <div class="code-display" id="afterCode"></div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalCitations">0</span>
+                    <span class="stat-label">Total Citations Removed</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="citeWithNumbers">0</span>
+                    <span class="stat-label">[cite: numbers] Removed</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="citeStart">0</span>
+                    <span class="stat-label">[cite_start] Removed</span>
+                </div>
+            </div>
+
+            <div class="result-actions">
+                <button class="copy-btn" onclick="copyCleanedCode()">
+                    📋 Copy Cleaned HTML
+                </button>
+                <button class="download-btn" onclick="downloadCleanedCode()">
+                    📥 Download as File
+                </button>
+                <button class="another-btn" onclick="resetForm()">
+                    🔄 Clean Another
+                </button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
