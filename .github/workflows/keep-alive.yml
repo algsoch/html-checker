@@ -1,0 +1,17 @@
+name: Keep Render Service Alive
+
+on:
+  schedule:
+    # Runs every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Service
+        run: |
+          echo "Pinging Render service to keep it alive..."
+          curl -f https://html-checker-1.onrender.com || echo "Ping failed, but continuing..."
+          echo "Ping completed at $(date)"
