@@ -1,9 +1,7 @@
 name: Deploy to Azure App Service
 
+# Disabled - Using Render for deployment instead
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:

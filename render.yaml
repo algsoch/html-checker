@@ -3,7 +3,7 @@ services:
     name: html-citation-cleaner
     runtime: python
     env: python
-    plan: free
+    plan: starter  # $7/month - keeps service always on, no cold starts
     region: oregon  # or singapore, frankfurt - choose based on your location
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
