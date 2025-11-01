@@ -15,6 +15,7 @@ def clean_html_content(html_content: str) -> str:
     """
     Remove [cite: numbers] and [cite_start] markers from HTML content.
     Removes entire tags if they ONLY contain cite markers.
+    Handles formats: [cite: 123], [cite: 124, 125], [cite: 105-107]
     
     Args:
         html_content: The HTML content to clean
@@ -28,14 +29,14 @@ def clean_html_content(html_content: str) -> str:
     cleaned = re.sub(r'<div>\s*\[cite_start\]\s*</div>', '', cleaned)
     cleaned = re.sub(r'<span>\s*\[cite_start\]\s*</span>', '', cleaned)
     
-    # Also remove tags that only contain [cite: numbers]
-    cleaned = re.sub(r'<p>\s*\[cite:\s*[\d,\s]+\]\s*</p>', '', cleaned)
-    cleaned = re.sub(r'<div>\s*\[cite:\s*[\d,\s]+\]\s*</div>', '', cleaned)
-    cleaned = re.sub(r'<span>\s*\[cite:\s*[\d,\s]+\]\s*</span>', '', cleaned)
+    # Also remove tags that only contain [cite: numbers] (with commas, spaces, or dashes)
+    cleaned = re.sub(r'<p>\s*\[cite:\s*[\d,\s\-]+\]\s*</p>', '', cleaned)
+    cleaned = re.sub(r'<div>\s*\[cite:\s*[\d,\s\-]+\]\s*</div>', '', cleaned)
+    cleaned = re.sub(r'<span>\s*\[cite:\s*[\d,\s\-]+\]\s*</span>', '', cleaned)
     
     # Then remove cite markers from remaining content (where tags have other text too)
-    # Remove [cite: <numbers>] pattern
-    cleaned = re.sub(r'\[cite:\s*[\d,\s]+\]', '', cleaned)
+    # Remove [cite: <numbers>] pattern - now handles commas AND dashes
+    cleaned = re.sub(r'\[cite:\s*[\d,\s\-]+\]', '', cleaned)
     
     # Remove remaining [cite_start] markers
     cleaned = re.sub(r'\[cite_start\]', '', cleaned)
@@ -68,8 +69,8 @@ async def upload_file(file: UploadFile = File(...)):
         content = await file.read()
         html_content = content.decode('utf-8')
         
-        # Count citations before cleaning
-        cite_with_numbers = len(re.findall(r'\[cite:\s*[\d,\s]+\]', html_content))
+        # Count citations before cleaning (now handles commas AND dashes)
+        cite_with_numbers = len(re.findall(r'\[cite:\s*[\d,\s\-]+\]', html_content))
         cite_start = len(re.findall(r'\[cite_start\]', html_content))
         total_citations = cite_with_numbers + cite_start
         

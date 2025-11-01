@@ -46,8 +46,8 @@ function cleanPastedCode() {
     // Store original for preview
     originalHtmlContent = htmlCode;
     
-    // Count citations before cleaning
-    const citeWithNumbersMatches = htmlCode.match(/\[cite:\s*[\d,\s]+\]/g) || [];
+    // Count citations before cleaning (handles commas AND dashes: [cite: 124, 125] or [cite: 105-107])
+    const citeWithNumbersMatches = htmlCode.match(/\[cite:\s*[\d,\s\-]+\]/g) || [];
     const citeStartMatches = htmlCode.match(/\[cite_start\]/g) || [];
     
     const citeWithNumbers = citeWithNumbersMatches.length;
@@ -62,12 +62,12 @@ function cleanPastedCode() {
     cleaned = cleaned.replace(/<div>\s*\[cite_start\]\s*<\/div>/g, '');
     cleaned = cleaned.replace(/<span>\s*\[cite_start\]\s*<\/span>/g, '');
     
-    cleaned = cleaned.replace(/<p>\s*\[cite:\s*[\d,\s]+\]\s*<\/p>/g, '');
-    cleaned = cleaned.replace(/<div>\s*\[cite:\s*[\d,\s]+\]\s*<\/div>/g, '');
-    cleaned = cleaned.replace(/<span>\s*\[cite:\s*[\d,\s]+\]\s*<\/span>/g, '');
+    cleaned = cleaned.replace(/<p>\s*\[cite:\s*[\d,\s\-]+\]\s*<\/p>/g, '');
+    cleaned = cleaned.replace(/<div>\s*\[cite:\s*[\d,\s\-]+\]\s*<\/div>/g, '');
+    cleaned = cleaned.replace(/<span>\s*\[cite:\s*[\d,\s\-]+\]\s*<\/span>/g, '');
     
     // Then remove cite markers from content (where tags have other text)
-    cleaned = cleaned.replace(/\[cite:\s*[\d,\s]+\]/g, '');
+    cleaned = cleaned.replace(/\[cite:\s*[\d,\s\-]+\]/g, '');
     cleaned = cleaned.replace(/\[cite_start\]/g, '');
     
     // Store cleaned content
@@ -94,8 +94,8 @@ function displayVisualization(beforeHtml, afterHtml, totalCitations, citeWithNum
         .replace(/<p>\s*\[cite_start\]\s*<\/p>/g, '<span class="highlight-cite">&lt;p&gt;[cite_start]&lt;/p&gt;</span>')
         .replace(/<div>\s*\[cite_start\]\s*<\/div>/g, '<span class="highlight-cite">&lt;div&gt;[cite_start]&lt;/div&gt;</span>')
         .replace(/<span>\s*\[cite_start\]\s*<\/span>/g, '<span class="highlight-cite">&lt;span&gt;[cite_start]&lt;/span&gt;</span>')
-        // Highlight cite with numbers
-        .replace(/\[cite:\s*[\d,\s]+\]/g, match => `<span class="highlight-cite">${escapeHtml(match)}</span>`)
+        // Highlight cite with numbers (handles commas AND dashes)
+        .replace(/\[cite:\s*[\d,\s\-]+\]/g, match => `<span class="highlight-cite">${escapeHtml(match)}</span>`)
         // Highlight remaining cite_start
         .replace(/\[cite_start\]/g, '<span class="highlight-cite">[cite_start]</span>');
     
@@ -286,12 +286,12 @@ function cleanHtmlContent(html) {
     cleaned = cleaned.replace(/<div>\s*\[cite_start\]\s*<\/div>/g, '');
     cleaned = cleaned.replace(/<span>\s*\[cite_start\]\s*<\/span>/g, '');
     
-    cleaned = cleaned.replace(/<p>\s*\[cite:\s*[\d,\s]+\]\s*<\/p>/g, '');
-    cleaned = cleaned.replace(/<div>\s*\[cite:\s*[\d,\s]+\]\s*<\/div>/g, '');
-    cleaned = cleaned.replace(/<span>\s*\[cite:\s*[\d,\s]+\]\s*<\/span>/g, '');
+    cleaned = cleaned.replace(/<p>\s*\[cite:\s*[\d,\s\-]+\]\s*<\/p>/g, '');
+    cleaned = cleaned.replace(/<div>\s*\[cite:\s*[\d,\s\-]+\]\s*<\/div>/g, '');
+    cleaned = cleaned.replace(/<span>\s*\[cite:\s*[\d,\s\-]+\]\s*<\/span>/g, '');
     
-    // Then remove cite markers from content
-    cleaned = cleaned.replace(/\[cite:\s*[\d,\s]+\]/g, '');
+    // Then remove cite markers from content (handles commas AND dashes)
+    cleaned = cleaned.replace(/\[cite:\s*[\d,\s\-]+\]/g, '');
     cleaned = cleaned.replace(/\[cite_start\]/g, '');
     
     return cleaned;
@@ -483,8 +483,8 @@ async function uploadFile() {
     reader.onload = function(e) {
         const htmlCode = e.target.result;
         
-        // Count citations before cleaning
-        const citeWithNumbersMatches = htmlCode.match(/\[cite:\s*[\d,\s]+\]/g) || [];
+        // Count citations before cleaning (handles commas AND dashes)
+        const citeWithNumbersMatches = htmlCode.match(/\[cite:\s*[\d,\s\-]+\]/g) || [];
         const citeStartMatches = htmlCode.match(/\[cite_start\]/g) || [];
         
         const citeWithNumbers = citeWithNumbersMatches.length;
@@ -499,12 +499,12 @@ async function uploadFile() {
         cleaned = cleaned.replace(/<div>\s*\[cite_start\]\s*<\/div>/g, '');
         cleaned = cleaned.replace(/<span>\s*\[cite_start\]\s*<\/span>/g, '');
         
-        cleaned = cleaned.replace(/<p>\s*\[cite:\s*[\d,\s]+\]\s*<\/p>/g, '');
-        cleaned = cleaned.replace(/<div>\s*\[cite:\s*[\d,\s]+\]\s*<\/div>/g, '');
-        cleaned = cleaned.replace(/<span>\s*\[cite:\s*[\d,\s]+\]\s*<\/span>/g, '');
+        cleaned = cleaned.replace(/<p>\s*\[cite:\s*[\d,\s\-]+\]\s*<\/p>/g, '');
+        cleaned = cleaned.replace(/<div>\s*\[cite:\s*[\d,\s\-]+\]\s*<\/div>/g, '');
+        cleaned = cleaned.replace(/<span>\s*\[cite:\s*[\d,\s\-]+\]\s*<\/span>/g, '');
         
-        // Then remove cite markers from content (where tags have other text)
-        cleaned = cleaned.replace(/\[cite:\s*[\d,\s]+\]/g, '');
+        // Then remove cite markers from content (handles commas AND dashes)
+        cleaned = cleaned.replace(/\[cite:\s*[\d,\s\-]+\]/g, '');
         cleaned = cleaned.replace(/\[cite_start\]/g, '');
         
         cleanedHtmlContent = cleaned;
