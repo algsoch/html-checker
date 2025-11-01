@@ -1,15 +1,418 @@
 let selectedFile = null;
+let cleanedHtmlContent = '';
+let originalHtmlContent = '';
+let currentMode = 'paste';
 
 // Get DOM elements
 const uploadBox = document.getElementById('uploadBox');
 const fileInput = document.getElementById('fileInput');
 const fileInfo = document.getElementById('fileInfo');
 const fileName = document.getElementById('fileName');
-const results = document.getElementById('results');
+const visualization = document.getElementById('visualization');
 const errorMessage = document.getElementById('errorMessage');
 const uploadBtn = document.querySelector('.upload-btn');
 const loader = document.getElementById('loader');
 const uploadBtnText = document.getElementById('uploadBtnText');
+const htmlInput = document.getElementById('htmlInput');
+const pasteMode = document.getElementById('pasteMode');
+const uploadMode = document.getElementById('uploadMode');
+
+// Mode switching
+function switchMode(mode) {
+    currentMode = mode;
+    
+    // Update button states
+    document.getElementById('pasteBtn').classList.toggle('active', mode === 'paste');
+    document.getElementById('uploadBtn').classList.toggle('active', mode === 'upload');
+    
+    // Toggle sections
+    pasteMode.classList.toggle('hidden', mode !== 'paste');
+    uploadMode.classList.toggle('hidden', mode !== 'upload');
+    
+    // Hide results
+    visualization.classList.add('hidden');
+    errorMessage.style.display = 'none';
+}
+
+// Clean pasted code
+function cleanPastedCode() {
+    const htmlCode = htmlInput.value.trim();
+    
+    if (!htmlCode) {
+        showError('Please paste some HTML code first');
+        return;
+    }
+    
+    // Store original for preview
+    originalHtmlContent = htmlCode;
+    
+    // Count citations before cleaning
+    const citeWithNumbersMatches = htmlCode.match(/\[cite:\s*[\d,\s]+\]/g) || [];
+    const citeStartMatches = htmlCode.match(/\[cite_start\]/g) || [];
+    
+    const citeWithNumbers = citeWithNumbersMatches.length;
+    const citeStart = citeStartMatches.length;
+    const totalCitations = citeWithNumbers + citeStart;
+    
+    // Clean the HTML
+    let cleaned = htmlCode;
+    
+    // First, remove tags that ONLY contain cite markers
+    cleaned = cleaned.replace(/<p>\s*\[cite_start\]\s*<\/p>/g, '');
+    cleaned = cleaned.replace(/<div>\s*\[cite_start\]\s*<\/div>/g, '');
+    cleaned = cleaned.replace(/<span>\s*\[cite_start\]\s*<\/span>/g, '');
+    
+    cleaned = cleaned.replace(/<p>\s*\[cite:\s*[\d,\s]+\]\s*<\/p>/g, '');
+    cleaned = cleaned.replace(/<div>\s*\[cite:\s*[\d,\s]+\]\s*<\/div>/g, '');
+    cleaned = cleaned.replace(/<span>\s*\[cite:\s*[\d,\s]+\]\s*<\/span>/g, '');
+    
+    // Then remove cite markers from content (where tags have other text)
+    cleaned = cleaned.replace(/\[cite:\s*[\d,\s]+\]/g, '');
+    cleaned = cleaned.replace(/\[cite_start\]/g, '');
+    
+    // Store cleaned content
+    cleanedHtmlContent = cleaned;
+    
+    // Always update live preview
+    updateLivePreview(htmlCode, cleaned);
+    
+    // Display results in visualization section
+    displayVisualization(htmlCode, cleaned, totalCitations, citeWithNumbers, citeStart);
+}
+
+// Display visualization
+function displayVisualization(beforeHtml, afterHtml, totalCitations, citeWithNumbers, citeStart) {
+    // Create stats object
+    const stats = {
+        total_citations_removed: totalCitations,
+        cite_with_numbers: citeWithNumbers,
+        cite_start_markers: citeStart
+    };
+    // Highlight citations in before code
+    let highlightedBefore = beforeHtml
+        // Highlight tags containing only cite_start
+        .replace(/<p>\s*\[cite_start\]\s*<\/p>/g, '<span class="highlight-cite">&lt;p&gt;[cite_start]&lt;/p&gt;</span>')
+        .replace(/<div>\s*\[cite_start\]\s*<\/div>/g, '<span class="highlight-cite">&lt;div&gt;[cite_start]&lt;/div&gt;</span>')
+        .replace(/<span>\s*\[cite_start\]\s*<\/span>/g, '<span class="highlight-cite">&lt;span&gt;[cite_start]&lt;/span&gt;</span>')
+        // Highlight cite with numbers
+        .replace(/\[cite:\s*[\d,\s]+\]/g, match => `<span class="highlight-cite">${escapeHtml(match)}</span>`)
+        // Highlight remaining cite_start
+        .replace(/\[cite_start\]/g, '<span class="highlight-cite">[cite_start]</span>');
+    
+    // Update before/after displays
+    document.getElementById('beforeCode').innerHTML = highlightedBefore;
+    document.getElementById('afterCode').textContent = afterHtml;
+    
+    // Update statistics
+    document.getElementById('totalCitations').textContent = stats.total_citations_removed;
+    document.getElementById('totalCitationsViz').textContent = stats.total_citations_removed;
+    document.getElementById('citeWithNumbers').textContent = stats.cite_with_numbers;
+    document.getElementById('citeStart').textContent = stats.cite_start_markers;
+    
+    // Update count badges
+    const beforeCount = stats.cite_with_numbers + stats.cite_start_markers;
+    document.getElementById('beforeCount').textContent = `${beforeCount} citation${beforeCount !== 1 ? 's' : ''}`;
+    document.getElementById('afterCount').textContent = 'Clean! ✓';
+    
+    // Show visualization
+    visualization.classList.remove('hidden');
+    
+    // Scroll to visualization
+    setTimeout(() => {
+        visualization.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+}
+
+// Escape HTML for display
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Copy cleaned code to clipboard
+function copyCleanedCode() {
+    if (!cleanedHtmlContent) {
+        showError('No cleaned code to copy');
+        return;
+    }
+    
+    // Create a temporary textarea
+    const textarea = document.createElement('textarea');
+    textarea.value = cleanedHtmlContent;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    textarea.style.top = '0';
+    document.body.appendChild(textarea);
+    
+    // Select and copy
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // For mobile devices
+    
+    let success = false;
+    try {
+        success = document.execCommand('copy');
+    } catch (err) {
+        console.error('Copy failed:', err);
+    }
+    
+    document.body.removeChild(textarea);
+    
+    if (success) {
+        showCopySuccess(event.target);
+    } else {
+        // If copy fails, select the text in the display area
+        selectCleanedCode();
+        showError('Auto-copy failed. Text selected - press Ctrl+C to copy manually');
+    }
+}
+
+// Select all cleaned code text
+function selectCleanedCode() {
+    const afterCodeElement = document.getElementById('afterCode');
+    
+    if (!afterCodeElement || !cleanedHtmlContent) {
+        showError('No cleaned code to select');
+        return;
+    }
+    
+    // Highlight the code panel
+    afterCodeElement.classList.add('selectable');
+    
+    // Create a range and select the text
+    if (window.getSelection) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(afterCodeElement);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        // Show success message
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Text Selected!';
+        btn.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+        
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.background = '';
+            afterCodeElement.classList.remove('selectable');
+        }, 3000);
+        
+        // Scroll to the selected text
+        afterCodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+// Show copy success feedback
+function showCopySuccess(btn, message = '✓ Copied!') {
+    const originalText = btn.textContent;
+    btn.textContent = message;
+    btn.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+    
+    setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+    }, 2000);
+}
+
+// Download cleaned code as file
+function downloadCleanedCode() {
+    if (!cleanedHtmlContent) {
+        showError('No cleaned code to download');
+        return;
+    }
+    
+    const blob = new Blob([cleanedHtmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cleaned_code.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Toggle live preview
+function togglePreview() {
+    const checkbox = document.getElementById('showPreview');
+    const previewSection = document.getElementById('livePreviewSection');
+    const htmlInput = document.getElementById('htmlInput');
+    
+    if (checkbox.checked) {
+        previewSection.classList.remove('hidden');
+        const html = htmlInput.value.trim();
+        if (html) {
+            const cleaned = cleanHtmlContent(html);
+            updateLivePreview(html, cleaned);
+        }
+    } else {
+        previewSection.classList.add('hidden');
+    }
+}
+
+// Update live preview panels with rendered HTML
+function updateLivePreview(originalHtml, cleanedHtml) {
+    const beforePreview = document.getElementById('beforePreview');
+    const afterPreview = document.getElementById('afterPreview');
+    const previewSection = document.getElementById('livePreviewSection');
+    
+    if (beforePreview && afterPreview) {
+        // Render HTML content
+        beforePreview.innerHTML = originalHtml;
+        afterPreview.innerHTML = cleanedHtml;
+        
+        // Show the preview section
+        if (previewSection) {
+            previewSection.classList.remove('hidden');
+        }
+        
+        // Render LaTeX/MathJax if present
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise([beforePreview, afterPreview]).catch((err) => {
+                console.log('MathJax rendering error:', err);
+            });
+        }
+    }
+}
+
+// Clean HTML content (helper function)
+function cleanHtmlContent(html) {
+    let cleaned = html;
+    
+    // First, remove tags that ONLY contain cite markers
+    cleaned = cleaned.replace(/<p>\s*\[cite_start\]\s*<\/p>/g, '');
+    cleaned = cleaned.replace(/<div>\s*\[cite_start\]\s*<\/div>/g, '');
+    cleaned = cleaned.replace(/<span>\s*\[cite_start\]\s*<\/span>/g, '');
+    
+    cleaned = cleaned.replace(/<p>\s*\[cite:\s*[\d,\s]+\]\s*<\/p>/g, '');
+    cleaned = cleaned.replace(/<div>\s*\[cite:\s*[\d,\s]+\]\s*<\/div>/g, '');
+    cleaned = cleaned.replace(/<span>\s*\[cite:\s*[\d,\s]+\]\s*<\/span>/g, '');
+    
+    // Then remove cite markers from content
+    cleaned = cleaned.replace(/\[cite:\s*[\d,\s]+\]/g, '');
+    cleaned = cleaned.replace(/\[cite_start\]/g, '');
+    
+    return cleaned;
+}
+
+// Auto-update preview on input
+document.addEventListener('DOMContentLoaded', function() {
+    const htmlInput = document.getElementById('htmlInput');
+    if (htmlInput) {
+        let typingTimer;
+        const doneTypingInterval = 500; // Wait 500ms after user stops typing
+        
+        htmlInput.addEventListener('input', function() {
+            clearTimeout(typingTimer);
+            const checkbox = document.getElementById('showPreview');
+            
+            if (checkbox && checkbox.checked) {
+                typingTimer = setTimeout(function() {
+                    const html = htmlInput.value.trim();
+                    if (html) {
+                        const cleaned = cleanHtmlContent(html);
+                        updateLivePreview(html, cleaned);
+                    }
+                }, doneTypingInterval);
+            }
+        });
+    }
+});
+
+// Copy as Rich Text (HTML format)
+function copyAsRichText() {
+    if (!cleanedHtmlContent) {
+        showError('No cleaned code to copy');
+        return;
+    }
+    
+    // Try to copy as HTML using clipboard API
+    if (navigator.clipboard && window.ClipboardItem) {
+        const blob = new Blob([cleanedHtmlContent], { type: 'text/html' });
+        const clipboardItem = new ClipboardItem({ 'text/html': blob });
+        
+        navigator.clipboard.write([clipboardItem])
+            .then(() => {
+                showCopySuccess(event.target, '✓ Copied as Rich Text!');
+            })
+            .catch(() => {
+                // Fallback to plain copy
+                copyCleanedCode();
+            });
+    } else {
+        // Fallback to regular copy
+        copyCleanedCode();
+    }
+}
+
+// Copy with formatting (indented HTML)
+function copyFormatted() {
+    if (!cleanedHtmlContent) {
+        showError('No cleaned code to copy');
+        return;
+    }
+    
+    const formatted = formatHTML(cleanedHtmlContent);
+    
+    const textarea = document.createElement('textarea');
+    textarea.value = formatted;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    
+    let success = false;
+    try {
+        success = document.execCommand('copy');
+    } catch (err) {
+        console.error('Copy failed:', err);
+    }
+    
+    document.body.removeChild(textarea);
+    
+    if (success) {
+        showCopySuccess(event.target, '✨ Copied Formatted!');
+    } else {
+        showError('Auto-copy failed. Please try another copy method');
+    }
+}
+
+// Simple HTML formatter
+function formatHTML(html) {
+    let formatted = '';
+    let indent = 0;
+    const tab = '  ';
+    
+    // Split by tags but keep them
+    const parts = html.split(/(<[^>]+>)/g);
+    
+    parts.forEach(part => {
+        const trimmed = part.trim();
+        if (!trimmed) return;
+        
+        if (trimmed.startsWith('</')) {
+            // Closing tag - decrease indent before adding
+            indent = Math.max(0, indent - 1);
+            formatted += tab.repeat(indent) + trimmed + '\n';
+        } else if (trimmed.startsWith('<') && !trimmed.endsWith('/>')) {
+            // Opening tag - add then increase indent
+            formatted += tab.repeat(indent) + trimmed + '\n';
+            if (!trimmed.startsWith('<!')) {
+                indent++;
+            }
+        } else if (trimmed.startsWith('<') && trimmed.endsWith('/>')) {
+            // Self-closing tag
+            formatted += tab.repeat(indent) + trimmed + '\n';
+        } else {
+            // Text content
+            formatted += tab.repeat(indent) + trimmed + '\n';
+        }
+    });
+    
+    return formatted;
+}
 
 // Drag and drop handlers
 uploadBox.addEventListener('dragover', (e) => {
@@ -54,18 +457,18 @@ function handleFileSelect(file) {
     fileName.textContent = file.name;
     
     // Hide upload box and show file info
-    uploadBox.style.display = 'none';
-    fileInfo.style.display = 'block';
-    results.style.display = 'none';
+    uploadBox.classList.add('hidden');
+    fileInfo.classList.remove('hidden');
+    visualization.classList.add('hidden');
     errorMessage.style.display = 'none';
 }
 
 function clearFile() {
     selectedFile = null;
     fileInput.value = '';
-    uploadBox.style.display = 'block';
-    fileInfo.style.display = 'none';
-    results.style.display = 'none';
+    uploadBox.classList.remove('hidden');
+    fileInfo.classList.add('hidden');
+    visualization.classList.add('hidden');
     errorMessage.style.display = 'none';
 }
 
@@ -75,60 +478,49 @@ async function uploadFile() {
         return;
     }
     
-    // Show loader
-    uploadBtn.disabled = true;
-    loader.style.display = 'block';
-    uploadBtnText.textContent = 'Processing...';
-    errorMessage.style.display = 'none';
-    
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-    
-    try {
-        const response = await fetch('/upload', {
-            method: 'POST',
-            body: formData
-        });
+    // Read file and process like pasted code
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const htmlCode = e.target.result;
         
-        const data = await response.json();
+        // Count citations before cleaning
+        const citeWithNumbersMatches = htmlCode.match(/\[cite:\s*[\d,\s]+\]/g) || [];
+        const citeStartMatches = htmlCode.match(/\[cite_start\]/g) || [];
         
-        if (!response.ok) {
-            throw new Error(data.detail || 'Upload failed');
-        }
+        const citeWithNumbers = citeWithNumbersMatches.length;
+        const citeStart = citeStartMatches.length;
+        const totalCitations = citeWithNumbers + citeStart;
         
-        // Show results
-        displayResults(data);
+        // Clean the HTML
+        let cleaned = htmlCode;
         
-    } catch (error) {
-        showError(error.message || 'An error occurred while processing the file');
-        uploadBtn.disabled = false;
-        loader.style.display = 'none';
-        uploadBtnText.textContent = 'Clean & Download';
-    }
-}
-
-function displayResults(data) {
-    // Update statistics
-    document.getElementById('totalCitations').textContent = 
-        data.statistics.total_citations_removed;
-    document.getElementById('citeWithNumbers').textContent = 
-        data.statistics.cite_with_numbers;
-    document.getElementById('citeStart').textContent = 
-        data.statistics.cite_start_markers;
+        // First, remove tags that ONLY contain cite markers
+        cleaned = cleaned.replace(/<p>\s*\[cite_start\]\s*<\/p>/g, '');
+        cleaned = cleaned.replace(/<div>\s*\[cite_start\]\s*<\/div>/g, '');
+        cleaned = cleaned.replace(/<span>\s*\[cite_start\]\s*<\/span>/g, '');
+        
+        cleaned = cleaned.replace(/<p>\s*\[cite:\s*[\d,\s]+\]\s*<\/p>/g, '');
+        cleaned = cleaned.replace(/<div>\s*\[cite:\s*[\d,\s]+\]\s*<\/div>/g, '');
+        cleaned = cleaned.replace(/<span>\s*\[cite:\s*[\d,\s]+\]\s*<\/span>/g, '');
+        
+        // Then remove cite markers from content (where tags have other text)
+        cleaned = cleaned.replace(/\[cite:\s*[\d,\s]+\]/g, '');
+        cleaned = cleaned.replace(/\[cite_start\]/g, '');
+        
+        cleanedHtmlContent = cleaned;
+        
+        // Display visualization
+        displayVisualization(htmlCode, cleaned, totalCitations, citeWithNumbers, citeStart);
+        
+        // Hide file info
+        fileInfo.classList.add('hidden');
+    };
     
-    // Set download link
-    const downloadLink = document.getElementById('downloadLink');
-    downloadLink.href = data.download_url;
-    downloadLink.download = data.output_filename;
+    reader.onerror = function() {
+        showError('Failed to read file');
+    };
     
-    // Hide file info and show results
-    fileInfo.style.display = 'none';
-    results.style.display = 'block';
-    
-    // Reset upload button
-    uploadBtn.disabled = false;
-    loader.style.display = 'none';
-    uploadBtnText.textContent = 'Clean & Download';
+    reader.readAsText(selectedFile);
 }
 
 function showError(message) {
@@ -144,11 +536,19 @@ function showError(message) {
 function resetForm() {
     selectedFile = null;
     fileInput.value = '';
-    uploadBox.style.display = 'block';
-    fileInfo.style.display = 'none';
-    results.style.display = 'none';
+    htmlInput.value = '';
+    cleanedHtmlContent = '';
+    
+    if (currentMode === 'paste') {
+        visualization.classList.add('hidden');
+    } else {
+        uploadBox.classList.remove('hidden');
+        fileInfo.classList.add('hidden');
+        visualization.classList.add('hidden');
+    }
+    
     errorMessage.style.display = 'none';
-    uploadBtn.disabled = false;
-    loader.style.display = 'none';
-    uploadBtnText.textContent = 'Clean & Download';
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }

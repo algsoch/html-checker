@@ -60,14 +60,18 @@ html-block-checker/
 
 ## How It Works
 
-The application uses regular expressions to identify and remove:
+The application processes HTML in two steps:
 
-1. **Citation with numbers**: `[cite: 124, 125]` or `[cite:124,125]`
-   - Matches various spacing patterns
-   - Removes all numbers inside square brackets with "cite:"
+**Step 1:** Remove tags that ONLY contain cite markers (no other text):
+- `<p>[cite_start]</p>` → Entire tag removed
+- `<p>[cite: 123]</p>` → Entire tag removed
+- `<div>[cite_start]</div>` → Entire tag removed
+- `<span>[cite: 456, 789]</span>` → Entire tag removed
 
-2. **Citation start markers**: `[cite_start]`
-   - Removes all occurrences
+**Step 2:** Remove cite markers from tags that have other content:
+- `<p>Some text [cite: 123]</p>` → `<p>Some text </p>`
+- `[cite_start]Other text` → `Other text`
+- `Text [cite: 124, 125] more text` → `Text  more text`
 
 The HTML structure remains completely intact during the cleaning process.
 
@@ -81,11 +85,13 @@ The HTML structure remains completely intact during the cleaning process.
 
 **Before:**
 ```html
+<p>[cite_start]</p>
 The text here. [cite: 124, 125] [cite_start]More text [cite: 126]
 ```
 
 **After:**
 ```html
+
 The text here. More text 
 ```
 

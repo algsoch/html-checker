@@ -3,14 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Cite Cleaner</title>
+    <title>HTML Cite Cleaner - Advanced Citation Removal Tool</title>
+    <link rel="icon" type="image/png" href="/templates/public/images/filter.png">
     <link rel="stylesheet" href="/static/style.css">
+    
+    <!-- MathJax for LaTeX Rendering -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+    </div>
+
     <div class="container">
-        <header>
-            <h1>🧹 HTML Cite Cleaner</h1>
-            <p class="subtitle">Remove citation markers from your HTML files</p>
+        <header class="main-header">
+            <div class="header-icon">
+                <img src="/templates/public/images/filter.png" alt="Filter Icon" class="logo-icon">
+            </div>
+            <h1 class="gradient-text">HTML Cite Cleaner</h1>
+            <p class="subtitle">Advanced Citation Removal Tool with Real-time Visualization</p>
+            <div class="feature-badges">
+                <span class="badge">⚡ Fast Processing</span>
+                <span class="badge">🎯 100% Accurate</span>
+                <span class="badge">🔒 Secure</span>
+            </div>
         </header>
 
         <div class="info-box">
@@ -19,8 +50,195 @@
             <ul>
                 <li><code>[cite: 124, 125]</code> - Citation markers with numbers</li>
                 <li><code>[cite_start]</code> - Citation start markers</li>
+                <li><code>&lt;p&gt;[cite_start]&lt;/p&gt;</code> - Tags containing only cite markers</li>
             </ul>
             <p>Your HTML structure remains completely intact!</p>
+        </div>
+
+        <!-- Example/Demo Section -->
+        <div class="demo-section">
+            <div class="demo-header">
+                <div class="demo-icon">💡</div>
+                <h2>See It In Action - Live Example</h2>
+                <p>Watch how citation markers are removed while preserving your HTML structure</p>
+            </div>
+            
+            <div class="demo-comparison">
+                <div class="demo-panel">
+                    <div class="demo-panel-header before-header">
+                        <span class="panel-icon">❌</span>
+                        <h3>Before Cleaning</h3>
+                        <span class="count-badge-demo">10 citations found</span>
+                    </div>
+                    <div class="demo-code">
+<span class="demo-highlight-remove" data-tooltip="Empty tag - completely removed!">&lt;p&gt;[cite_start]&lt;/p&gt;</span>&lt;div&gt;
+  &lt;div&gt;
+    &lt;h4&gt;&lt;span&gt;Question 49&lt;/span&gt;&lt;/h4&gt;
+  &lt;/div&gt;
+  &lt;div&gt;
+    &lt;div&gt;In a paper chromatography experiment, a sample 
+    of a pigment is separated into two components, 
+    X and Y, as shown in the figure above. 
+    <span class="demo-highlight-remove" data-tooltip="Citation numbers removed">[cite: 99, 100]</span> <span class="demo-highlight-remove" data-tooltip="Citation marker removed">[cite_start]</span>The surface of 
+    the paper is moderately polar. <span class="demo-highlight-remove" data-tooltip="Another citation">[cite: 101]</span> What can be 
+    concluded about X and Y based on the experimental 
+    results?&lt;/div&gt;
+    
+    &lt;div&gt;At t=30 min, the solvent (Hexane) has moved 
+    up, separating the pigment into Component Y (lower) 
+    and Component X (higher).&lt;/div&gt;
+    
+    &lt;div&gt;
+      (A) X has a larger molar mass than Y does. 
+      <span class="demo-highlight-remove">[cite: 102]</span><span class="demo-highlight-remove">[cite_start]</span>&lt;br /&gt;
+      (B) Y has a larger molar mass than X does. 
+      <span class="demo-highlight-remove">[cite: 103]</span><span class="demo-highlight-remove">[cite_start]</span>&lt;br /&gt;
+      (C) X is more polar than Y. 
+      <span class="demo-highlight-remove">[cite: 104]</span><span class="demo-highlight-remove">[cite_start]</span>&lt;br /&gt;
+      (D) Y is more polar than X. <span class="demo-highlight-remove">[cite: 105]</span>
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div&gt;
+  &lt;details&gt;
+    &lt;summary&gt;▶️ Answer/Explanation&lt;/summary&gt;
+    &lt;div&gt;
+      &lt;div&gt;Detailed solution&lt;/div&gt;
+      &lt;p&gt;&lt;b&gt;1. Identify Phases:&lt;/b&gt;&lt;br /&gt;
+      * <span class="demo-highlight-remove">[cite_start]</span>&lt;b&gt;Stationary Phase:&lt;/b&gt; The filter 
+      paper, which is "moderately polar". <span class="demo-highlight-remove">[cite: 101]</span>
+      &lt;br /&gt;
+      * <span class="demo-highlight-remove">[cite_start]</span>&lt;b&gt;Mobile Phase:&lt;/b&gt; The solvent, 
+      Hexane (C₆H₁₄), which is &lt;b&gt;nonpolar&lt;/b&gt;. 
+      <span class="demo-highlight-remove">[cite: 97]</span>&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/details&gt;
+&lt;/div&gt;
+                    </div>
+                </div>
+                
+                <div class="demo-arrow">
+                    <div class="arrow-symbol">
+                        <div class="arrow-line"></div>
+                        <div class="arrow-head"></div>
+                    </div>
+                    <div class="arrow-label">
+                        <span class="cleaning-badge">🧹 AI Cleaning Process</span>
+                    </div>
+                    <div class="transformation-steps">
+                        <div class="step">Step 1: Detect Citations</div>
+                        <div class="step">Step 2: Remove Empty Tags</div>
+                        <div class="step">Step 3: Clean Markers</div>
+                        <div class="step">Step 4: Preserve Structure</div>
+                    </div>
+                </div>
+                
+                <div class="demo-panel">
+                    <div class="demo-panel-header after-header">
+                        <span class="panel-icon">✅</span>
+                        <h3>After Cleaning</h3>
+                        <span class="count-badge-demo success">100% Clean!</span>
+                    </div>
+                    <div class="demo-code clean">
+&lt;div&gt;
+  &lt;div&gt;
+    &lt;h4&gt;&lt;span&gt;Question 49&lt;/span&gt;&lt;/h4&gt;
+  &lt;/div&gt;
+  &lt;div&gt;
+    &lt;div&gt;In a paper chromatography experiment, a sample 
+    of a pigment is separated into two components, 
+    X and Y, as shown in the figure above. The surface of 
+    the paper is moderately polar. What can be 
+    concluded about X and Y based on the experimental 
+    results?&lt;/div&gt;
+    
+    &lt;div&gt;At t=30 min, the solvent (Hexane) has moved 
+    up, separating the pigment into Component Y (lower) 
+    and Component X (higher).&lt;/div&gt;
+    
+    &lt;div&gt;
+      (A) X has a larger molar mass than Y does. &lt;br /&gt;
+      (B) Y has a larger molar mass than X does. &lt;br /&gt;
+      (C) X is more polar than Y. &lt;br /&gt;
+      (D) Y is more polar than X. 
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div&gt;
+  &lt;details&gt;
+    &lt;summary&gt;▶️ Answer/Explanation&lt;/summary&gt;
+    &lt;div&gt;
+      &lt;div&gt;Detailed solution&lt;/div&gt;
+      &lt;p&gt;&lt;b&gt;1. Identify Phases:&lt;/b&gt;&lt;br /&gt;
+      * &lt;b&gt;Stationary Phase:&lt;/b&gt; The filter 
+      paper, which is "moderately polar". 
+      &lt;br /&gt;
+      * &lt;b&gt;Mobile Phase:&lt;/b&gt; The solvent, 
+      Hexane (C₆H₁₄), which is &lt;b&gt;nonpolar&lt;/b&gt;. &lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/details&gt;
+&lt;/div&gt;
+                    </div>
+                </div>
+            </div>
+            
+            <div class="demo-explanation">
+                <div class="explanation-header">
+                    <span class="explanation-icon">🔍</span>
+                    <h4>What Got Cleaned?</h4>
+                </div>
+                <div class="explanation-grid">
+                    <div class="explanation-item">
+                        <span class="item-icon">🗑️</span>
+                        <div class="item-content">
+                            <strong>Empty Tags Removed</strong>
+                            <p>1 tag: <code>&lt;p&gt;[cite_start]&lt;/p&gt;</code> completely deleted because it contained only citation markers</p>
+                        </div>
+                    </div>
+                    <div class="explanation-item">
+                        <span class="item-icon">🔢</span>
+                        <div class="item-content">
+                            <strong>Citation Numbers Cleaned</strong>
+                            <p>6 instances: <code>[cite: 99, 100]</code>, <code>[cite: 101]</code>, <code>[cite: 102]</code>, <code>[cite: 103]</code>, <code>[cite: 104]</code>, <code>[cite: 105]</code>, <code>[cite: 97]</code></p>
+                        </div>
+                    </div>
+                    <div class="explanation-item">
+                        <span class="item-icon">🏷️</span>
+                        <div class="item-content">
+                            <strong>Citation Markers Removed</strong>
+                            <p>7 instances of <code>[cite_start]</code> markers removed from content</p>
+                        </div>
+                    </div>
+                    <div class="explanation-item">
+                        <span class="item-icon">✨</span>
+                        <div class="item-content">
+                            <strong>Perfect Structure</strong>
+                            <p>All HTML tags, formatting, and actual content preserved - only citations removed!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="demo-stats">
+                    <div class="demo-stat-card">
+                        <div class="stat-number-large">10</div>
+                        <div class="stat-label-large">Total Citations</div>
+                    </div>
+                    <div class="demo-stat-card success">
+                        <div class="stat-number-large">100%</div>
+                        <div class="stat-label-large">Success Rate</div>
+                    </div>
+                    <div class="demo-stat-card info">
+                        <div class="stat-number-large">1</div>
+                        <div class="stat-label-large">Empty Tags</div>
+                    </div>
+                </div>
+            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="mode-selector">
@@ -104,6 +322,34 @@
                 </div>
             </div>
 
+            <!-- Live Preview Section - Rendered Output -->
+            <div id="livePreviewSection" class="live-preview-section">
+                <div class="preview-header-main">
+                    <h2>👁️ Live Preview - Rendered Output</h2>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 5px;">See how your HTML actually renders before and after cleaning</p>
+                </div>
+                
+                <div class="preview-comparison">
+                    <div class="preview-panel">
+                        <div class="preview-header before-preview">
+                            <h4>🔴 Before Cleaning - Rendered View</h4>
+                        </div>
+                        <div id="beforePreview" class="preview-content"></div>
+                    </div>
+                    
+                    <div class="preview-arrow">
+                        <div class="arrow-animated">→</div>
+                    </div>
+                    
+                    <div class="preview-panel">
+                        <div class="preview-header after-preview">
+                            <h4>🟢 After Cleaning - Rendered View</h4>
+                        </div>
+                        <div id="afterPreview" class="preview-content"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="stats">
                 <div class="stat-item">
                     <span class="stat-number" id="totalCitations">0</span>
@@ -121,13 +367,22 @@
 
             <div class="result-actions">
                 <button class="copy-btn" onclick="copyCleanedCode()">
-                    📋 Copy Cleaned HTML
+                    📋 Copy to Clipboard
+                </button>
+                <button class="copy-rich-btn" onclick="copyAsRichText()">
+                    📑 Copy as Rich Text
+                </button>
+                <button class="select-btn" onclick="selectCleanedCode()">
+                    🎯 Select All Text
                 </button>
                 <button class="download-btn" onclick="downloadCleanedCode()">
-                    📥 Download as File
+                    📥 Download HTML
+                </button>
+                <button class="copy-formatted-btn" onclick="copyFormatted()">
+                    ✨ Copy Formatted
                 </button>
                 <button class="another-btn" onclick="resetForm()">
-                    🔄 Clean Another
+                    🔄 Clean Another File
                 </button>
             </div>
         </div>

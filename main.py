@@ -9,10 +9,12 @@ app = FastAPI(title="HTML Cite Cleaner")
 
 # Serve static files (CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/templates/public", StaticFiles(directory="templates/public"), name="public")
 
 def clean_html_content(html_content: str) -> str:
     """
     Remove [cite: numbers] and [cite_start] markers from HTML content.
+    Removes entire tags if they ONLY contain cite markers.
     
     Args:
         html_content: The HTML content to clean
@@ -20,11 +22,22 @@ def clean_html_content(html_content: str) -> str:
     Returns:
         Cleaned HTML content without cite markers
     """
-    # Remove [cite: <numbers>] pattern (handles various spacing)
-    # Matches patterns like [cite: 124], [cite: 124, 125], [cite:124,125], etc.
-    cleaned = re.sub(r'\[cite:\s*[\d,\s]+\]', '', html_content)
+    # First, remove tags that ONLY contain cite markers (nothing else inside)
+    # Match <p>, <div>, <span> that contain only whitespace and cite markers
+    cleaned = re.sub(r'<p>\s*\[cite_start\]\s*</p>', '', html_content)
+    cleaned = re.sub(r'<div>\s*\[cite_start\]\s*</div>', '', cleaned)
+    cleaned = re.sub(r'<span>\s*\[cite_start\]\s*</span>', '', cleaned)
     
-    # Remove [cite_start] markers
+    # Also remove tags that only contain [cite: numbers]
+    cleaned = re.sub(r'<p>\s*\[cite:\s*[\d,\s]+\]\s*</p>', '', cleaned)
+    cleaned = re.sub(r'<div>\s*\[cite:\s*[\d,\s]+\]\s*</div>', '', cleaned)
+    cleaned = re.sub(r'<span>\s*\[cite:\s*[\d,\s]+\]\s*</span>', '', cleaned)
+    
+    # Then remove cite markers from remaining content (where tags have other text too)
+    # Remove [cite: <numbers>] pattern
+    cleaned = re.sub(r'\[cite:\s*[\d,\s]+\]', '', cleaned)
+    
+    # Remove remaining [cite_start] markers
     cleaned = re.sub(r'\[cite_start\]', '', cleaned)
     
     return cleaned
