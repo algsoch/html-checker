@@ -6,7 +6,101 @@ This guide covers deployment to various cloud platforms. Choose the one that bes
 
 ---
 
-## 1. Deploy to Azure App Service
+## 1. Deploy to Render
+
+Render offers a generous free tier and simple deployment process with auto-detection of configuration.
+
+### Quick Deployment Steps
+
+1. Go to [Render Dashboard](https://render.com)
+2. Sign up or log in
+3. Click "New +" → "Web Service"
+4. Connect your GitHub repository: `algsoch/html-checker`
+5. Render will auto-detect the `render.yaml` configuration
+6. Click "Create Web Service"
+
+**Auto-deploys** on every push to main branch!
+
+### Configuration
+
+The repository includes a `render.yaml` file with optimal settings:
+
+```yaml
+services:
+  - type: web
+    name: html-citation-cleaner
+    runtime: python
+    env: python
+    plan: free  # or 'starter' for $7/month always-on service
+    region: oregon  # or singapore, frankfurt
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
+    healthCheckPath: /
+```
+
+### Free Tier Details
+
+**Included in Free Tier:**
+- 750 hours/month runtime
+- 512MB RAM
+- Automatic HTTPS
+- Custom domains supported
+- Auto-deploy from GitHub
+
+**Limitations:**
+- Service sleeps after 15 minutes of inactivity
+- ~50 second cold start on first request after sleep
+- 750 hours limit per month
+
+### Upgrade to Starter Plan ($7/month)
+
+**Benefits:**
+- Always-on service (no sleep)
+- No cold starts
+- Unlimited hours
+- Better performance
+
+**To upgrade:**
+1. Go to your service settings in Render dashboard
+2. Click "Settings" → "Plan"
+3. Select "Starter"
+4. Update `render.yaml` to use 2 workers for better performance
+
+### Keep-Alive Workflow (Optional)
+
+The repository includes `.github/workflows/keep-alive.yml` that pings your service every 5 minutes.
+
+**Pros:**
+- Reduces cold starts
+- Better user experience
+
+**Cons:**
+- Uses ~360 hours/month of your 750-hour free tier limit
+- May cause service to exceed free tier
+
+**Recommendation:**
+- **Free Tier Users:** Disable this workflow (see below)
+- **Paid Tier Users:** Keep it enabled
+
+**To disable:**
+1. Go to GitHub repository → Actions tab
+2. Click "Keep Render Service Alive" workflow
+3. Click "..." → "Disable workflow"
+
+### Troubleshooting
+
+See [RENDER_TROUBLESHOOTING.md](RENDER_TROUBLESHOOTING.md) for comprehensive troubleshooting guide including:
+- Service suspended issues
+- Build failures
+- Cold start optimization
+- And more
+
+**Your Service URL:**
+`https://<your-service-name>.onrender.com`
+
+---
+
+## 2. Deploy to Azure App Service
 
 Azure offers reliable hosting with good integration with GitHub Actions.
 
@@ -80,7 +174,7 @@ az webapp deployment list --name $APP_NAME --resource-group $RESOURCE_GROUP
 
 ---
 
-## 2. Deploy to DigitalOcean App Platform
+## 3. Deploy to DigitalOcean App Platform
 
 Simple deployment with competitive pricing.
 
@@ -102,7 +196,7 @@ Simple deployment with competitive pricing.
 
 ---
 
-## 3. Deploy to Railway
+## 4. Deploy to Railway
 
 Modern platform with good developer experience.
 
@@ -126,7 +220,7 @@ Modern platform with good developer experience.
 
 ---
 
-## 4. Deploy to Heroku
+## 5. Deploy to Heroku
 
 ### Prerequisites
 - [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) installed
@@ -156,7 +250,7 @@ heroku open
 
 ---
 
-## 5. Deploy to Google Cloud Run
+## 6. Deploy to Google Cloud Run
 
 Serverless deployment with pay-per-use pricing.
 
@@ -184,7 +278,7 @@ Serverless deployment with pay-per-use pricing.
 
 ---
 
-## 6. Deploy to Fly.io
+## 7. Deploy to Fly.io
 
 Global deployment platform.
 
@@ -211,6 +305,7 @@ Global deployment platform.
 
 | Platform | Entry Price | Free Tier | Best For |
 |----------|-------------|-----------|----------|
+| **Render** | $7/month (Starter) | 750 hrs/mo | Free tier, easy setup |
 | **Azure App Service** | $13/month (B1) | Limited F1 | Enterprise, reliability |
 | **DigitalOcean** | $5/month | No | Simple pricing |
 | **Railway** | $5/month | 500 hrs/mo | Modern dev experience |
@@ -223,12 +318,15 @@ Global deployment platform.
 ## Recommendations
 
 ### For Students/Learning:
+- **Render**: Best free tier (750 hours/month), easy setup ⭐ **Recommended for Free Tier**
 - **Railway**: Good trial, easy to use
 - **Azure F1**: Free tier (with limitations)
 - **Fly.io**: Generous free tier
 
 ### For Production:
-- **Azure B1**: Reliable, $13/month ⭐ **Recommended**
+- **Render Starter**: $7/month, always-on, no cold starts
+- **DigitalOcean**: Simple, $5-12/month
+- **Azure B1**: Reliable, $13/month ⭐ **Recommended for Enterprise**
 - **DigitalOcean**: Simple, $5-12/month
 - **Railway**: Modern, $5/month
 
