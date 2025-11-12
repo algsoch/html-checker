@@ -30,8 +30,10 @@ A powerful web application built with **FastAPI** that intelligently removes cit
 
 ### Try it now:
 - **Render**: [https://html-checker-1.onrender.com](https://html-checker-1.onrender.com) ✅ **Primary**
-- **Status**: Live 24/7 with GitHub Actions keep-alive
-- **Response Time**: < 200ms (warm) | ~50s (cold start on free tier)
+- **Status**: Running on free tier (may have cold starts)
+- **Response Time**: < 200ms (warm) | ~50s (cold start after 15 min inactivity)
+
+> ⚠️ **Note:** Free tier services sleep after 15 minutes of inactivity. First request may take ~50 seconds to wake up. See [Render Troubleshooting Guide](RENDER_TROUBLESHOOTING.md) if deployment fails.
 
 ## 🛠️ Installation
 
@@ -135,27 +137,72 @@ Removes cite markers from tags that contain other content:
 
 ## 🌐 Deployment
 
-### Deploy to Render (Recommended - Free Tier)
+### Deploy to Render (Recommended)
+
+#### Quick Deployment Steps:
 
 1. Fork this repository
 2. Go to [Render Dashboard](https://render.com)
 3. Click "New +" → "Web Service"
 4. Connect your GitHub repo
-5. **Update Start Command** to:
-   ```
-   gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
-   ```
+5. Render will auto-detect `render.yaml` configuration
 6. Click "Create Web Service"
 
 **Auto-deploys** on every push to main branch!
 
-**Keep it Always Alive (Free):**
-- The repository includes a GitHub Actions workflow (`.github/workflows/keep-alive.yml`)
-- Automatically pings your service every 5 minutes to prevent cold starts
-- Uses GitHub Actions free tier (2,000 minutes/month)
-- Your service stays warm and responsive 24/7!
+#### Free Tier vs Paid Tier:
 
-### Deploy to Azure (Paid - B1 Tier Recommended)
+| Feature | Free Tier | Starter Plan ($7/mo) |
+|---------|-----------|----------------------|
+| **Cost** | $0/month | $7/month |
+| **Hours** | 750 hours/month | Unlimited |
+| **Sleep** | After 15 min inactivity | Never |
+| **Cold Start** | ~50 seconds | None |
+| **Workers** | 1 recommended | 2-4 recommended |
+| **Best For** | Personal/Learning | Production |
+
+#### Configuration:
+
+**For Free Tier (Default):**
+```yaml
+# render.yaml already configured for free tier
+plan: free
+startCommand: gunicorn main:app --workers 1 ...
+```
+
+**For Paid Tier (Always-On):**
+```yaml
+# Update render.yaml
+plan: starter  # $7/month
+startCommand: gunicorn main:app --workers 2 ...
+```
+
+#### Keep-Alive Workflow (Optional):
+
+The repository includes `.github/workflows/keep-alive.yml` that pings your service every 5 minutes:
+
+**Pros:**
+- Reduces cold starts (keeps service warm)
+- Better user experience
+
+**Cons:**
+- Uses ~360 hours/month of your 750-hour free tier limit
+- May cause service to exceed free tier limits
+
+**Recommendation:**
+- **Free Tier Users:** Disable keep-alive workflow to conserve hours (see [Troubleshooting Guide](RENDER_TROUBLESHOOTING.md))
+- **Paid Tier Users:** Keep it enabled for best performance
+
+#### 🔴 Deployment Failed or Suspended?
+
+See our comprehensive [**Render Troubleshooting Guide**](RENDER_TROUBLESHOOTING.md) for solutions to:
+- Service suspended due to free tier limits
+- Build failures
+- Service crashes
+- Cold start issues
+- And more!
+
+### Deploy to Azure (Alternative - Paid)
 
 ```bash
 # Using Azure CLI

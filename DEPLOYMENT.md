@@ -58,16 +58,28 @@ git push azure main
 1. Go to https://render.com
 2. Connect your GitHub repository: `algsoch/html-checker`
 3. Create new Web Service
-4. Settings:
-   - **Name**: html-citation-cleaner
-   - **Region**: Oregon (or Singapore/Frankfurt based on location)
-   - **Branch**: main
-   - **Runtime**: Python 3
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-   - **Plan**: Free
-
+4. Render will auto-detect `render.yaml` configuration
 5. Click "Create Web Service"
+
+**Configuration in `render.yaml`:**
+```yaml
+plan: free  # or 'starter' for $7/month always-on service
+startCommand: gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
+```
+
+**Free Tier Limitations:**
+- Service sleeps after 15 minutes of inactivity
+- ~50 second cold start on first request
+- 750 hours/month limit
+
+**Upgrade to Starter ($7/month) for:**
+- Always-on service (no sleep)
+- No cold starts
+- Unlimited hours
+
+### Troubleshooting
+
+If your deployment fails or gets suspended, see our comprehensive [**Render Troubleshooting Guide**](RENDER_TROUBLESHOOTING.md).
 
 Or use Render CLI:
 ```powershell
