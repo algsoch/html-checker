@@ -30,8 +30,13 @@ A powerful web application built with **FastAPI** that intelligently removes cit
 
 ### Try it now:
 - **Render**: [https://html-checker-1.onrender.com](https://html-checker-1.onrender.com) ✅ **Primary**
-- **Status**: Live 24/7 with GitHub Actions keep-alive
-- **Response Time**: < 200ms (warm) | ~50s (cold start on free tier)
+- **Status**: Running on free tier (may have cold starts after 15 min inactivity)
+- **Response Time**: < 200ms (warm) | ~50s (cold start)
+
+> ⚠️ **Note:** This instance runs on Render's free tier. See [RENDER_TROUBLESHOOTING.md](RENDER_TROUBLESHOOTING.md) if you encounter issues.
+
+### Deploy Your Own Instance:
+This application can be easily deployed to various cloud platforms including Render, Azure, DigitalOcean, Railway, Heroku, and more. See the [Deployment](#-deployment) section below for detailed instructions.
 
 ## 🛠️ Installation
 
@@ -89,11 +94,14 @@ http://localhost:8000
 html-citation-cleaner/
 ├── main.py                     # FastAPI backend with cleaning logic
 ├── requirements.txt            # Python dependencies
-├── startup.sh                  # Azure startup script
 ├── render.yaml                 # Render deployment config
+├── startup.sh                  # Azure startup script
+├── Procfile                    # Heroku deployment config
 ├── .github/
 │   └── workflows/
-│       └── azure-deploy.yml    # GitHub Actions CI/CD
+│       ├── main_html-checker.yml    # Azure GitHub Actions CI/CD
+│       ├── azure-deploy.yml         # Alternative Azure deployment
+│       └── keep-alive.yml           # Render keep-alive (optional)
 ├── templates/
 │   ├── index.html             # Main UI with live preview
 │   └── public/
@@ -135,34 +143,228 @@ Removes cite markers from tags that contain other content:
 
 ## 🌐 Deployment
 
-### Deploy to Render (Recommended - Free Tier)
+This application can be deployed to multiple cloud platforms. Choose the one that best fits your needs:
+
+### Deploy to Render (Free Tier Available)
+
+Render offers a generous free tier and simple deployment process.
+
+**Deployment Steps:**
 
 1. Fork this repository
 2. Go to [Render Dashboard](https://render.com)
 3. Click "New +" → "Web Service"
 4. Connect your GitHub repo
-5. **Update Start Command** to:
+5. Render will auto-detect the `render.yaml` configuration
+6. Click "Create Web Service"
+
+**Configuration (already in `render.yaml`):**
+```yaml
+plan: free  # or 'starter' ($7/month) for always-on
+startCommand: gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
+```
+
+**Free Tier Features:**
+- 750 hours/month
+- Service sleeps after 15 minutes of inactivity
+- ~50 second cold start on first request
+- Perfect for personal projects and learning
+
+**Upgrade to Starter ($7/month) for:**
+- Always-on service (no sleep)
+- No cold starts
+- Unlimited hours
+
+**Keep-Alive Option:**
+- The repository includes `.github/workflows/keep-alive.yml` that pings your service every 5 minutes
+- **Warning:** This uses ~360 hours/month of your free tier limit
+- Recommended to disable for free tier users (see [RENDER_TROUBLESHOOTING.md](RENDER_TROUBLESHOOTING.md))
+
+**Troubleshooting:**
+See [RENDER_TROUBLESHOOTING.md](RENDER_TROUBLESHOOTING.md) for detailed solutions to common issues.
+
+---
+
+### Deploy to Azure App Service (Enterprise Option)
+
+Azure offers reliable hosting with good free tier options and easy GitHub integration.
+
+#### Using GitHub Actions (Automated):
+
+The repository includes a pre-configured workflow (`.github/workflows/main_html-checker.yml`) that automatically deploys to Azure on every push to main branch.
+
+**Setup:**
+1. Create an Azure App Service with Python runtime
+2. Configure deployment credentials in GitHub repository secrets
+3. Push to main branch - auto-deploys!
+
+#### Using Azure CLI (Manual):
+
+```bash
+# Login to Azure
+az login
+
+# Create resource group
+az group create --name html-checker-rg --location eastus
+
+# Create App Service Plan (choose tier based on needs)
+# Free F1: Good for testing ($0/month, has limitations)
+# Basic B1: Recommended for production ($13/month)
+az appservice plan create --name html-checker-plan --resource-group html-checker-rg --sku B1 --is-linux
+
+# Create Web App
+az webapp create --resource-group html-checker-rg --plan html-checker-plan --name your-unique-app-name --runtime "PYTHON:3.11"
+
+# Configure startup command
+az webapp config set --resource-group html-checker-rg --name your-unique-app-name --startup-file "gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --timeout 120"
+
+# Deploy code
+az webapp up --name your-unique-app-name --resource-group html-checker-rg
+```
+
+**Azure Pricing:**
+- **Free F1**: $0/month (60 CPU minutes/day, 1GB RAM) - Good for testing
+- **Basic B1**: ~$13/month (Unlimited, 1.75GB RAM) - Recommended for production
+- **Standard S1**: ~$70/month (Better performance, auto-scaling)
+
+---
+
+### Deploy to DigitalOcean App Platform
+
+DigitalOcean offers simple deployment with competitive pricing.
+
+**Deployment Steps:**
+1. Go to [DigitalOcean App Platform](https://cloud.digitalocean.com/apps)
+2. Click "Create App" → Connect your GitHub repository
+3. Configure:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Run Command**: `gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120`
+   - **HTTP Port**: 8080 (or use environment variable $PORT)
+4. Choose plan and deploy
+
+**DigitalOcean Pricing:**
+- **Basic**: $5/month (512MB RAM, 1 vCPU)
+- **Professional**: $12/month (1GB RAM, 1 vCPU)
+- **Pro+**: $24/month (2GB RAM, 2 vCPU)
+
+---
+
+### Deploy to Railway
+
+Railway provides a modern deployment experience with generous free tier.
+
+**Deployment Steps:**
+1. Go to [Railway](https://railway.app)
+2. Click "New Project" → "Deploy from GitHub repo"
+3. Select your repository
+4. Railway auto-detects Python and installs dependencies
+5. Add start command in settings:
    ```
    gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
    ```
-6. Click "Create Web Service"
 
-**Auto-deploys** on every push to main branch!
+**Railway Pricing:**
+- **Hobby**: $5/month (512MB RAM, shared CPU)
+- **Pro**: Starting at $20/month (more resources)
 
-**Keep it Always Alive (Free):**
-- The repository includes a GitHub Actions workflow (`.github/workflows/keep-alive.yml`)
-- Automatically pings your service every 5 minutes to prevent cold starts
-- Uses GitHub Actions free tier (2,000 minutes/month)
-- Your service stays warm and responsive 24/7!
+---
 
-### Deploy to Azure (Paid - B1 Tier Recommended)
+### Deploy to Heroku
 
-```bash
-# Using Azure CLI
-az webapp up --name your-app-name --resource-group your-rg --runtime "PYTHON:3.11" --sku B1 --location centralindia
-```
+**Note:** Heroku discontinued free tier in November 2022.
 
-**Note:** Free F1 tier has startup issues. Use B1 tier ($13/month) for reliable performance.
+**Deployment Steps:**
+1. Create a `Procfile` in your repository (already included):
+   ```
+   web: gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
+   ```
+2. Install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+3. Deploy:
+   ```bash
+   heroku login
+   heroku create your-app-name
+   git push heroku main
+   ```
+
+**Heroku Pricing:**
+- **Basic**: $7/month per dyno
+- **Standard**: $25-50/month per dyno
+
+---
+
+### Deploy to Google Cloud Run
+
+Serverless deployment with pay-per-use pricing.
+
+**Deployment Steps:**
+1. Create a `Dockerfile` (if not exists):
+   ```dockerfile
+   FROM python:3.11-slim
+   WORKDIR /app
+   COPY requirements.txt .
+   RUN pip install -r requirements.txt
+   COPY . .
+   CMD ["gunicorn", "main:app", "--workers", "2", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8080", "--timeout", "120"]
+   ```
+2. Deploy:
+   ```bash
+   gcloud run deploy html-checker --source . --platform managed --region us-central1 --allow-unauthenticated
+   ```
+
+**Google Cloud Run Pricing:**
+- Pay per use (free tier: 2 million requests/month)
+- ~$0.24 per million requests after free tier
+
+---
+
+### Deploy to Fly.io
+
+Modern platform with global deployment.
+
+**Deployment Steps:**
+1. Install [Fly CLI](https://fly.io/docs/hands-on/install-flyctl/)
+2. Deploy:
+   ```bash
+   fly launch
+   fly deploy
+   ```
+
+**Fly.io Pricing:**
+- **Free**: 3 shared-cpu-1x VMs with 256MB RAM
+- **Paid**: Starting at $1.94/month per VM
+
+---
+
+## 🎯 Deployment Comparison
+
+| Platform | Entry Price | Free Tier | Auto-Sleep | Best For |
+|----------|-------------|-----------|------------|----------|
+| **Render** | $7/month (Starter) | 750 hrs/mo | After 15 min | Free tier, easy setup |
+| **Azure** | $13/month (B1) | Limited F1 | No | Enterprise, Microsoft ecosystem |
+| **DigitalOcean** | $5/month | No | No | Simple, predictable pricing |
+| **Railway** | $5/month | 500 hours/mo | No | Modern development |
+| **Heroku** | $7/month | No (removed) | No | Quick deployment |
+| **Google Cloud Run** | Pay-per-use | 2M req/month | Yes | Serverless, variable traffic |
+| **Fly.io** | $1.94/month | Limited | No | Global deployment |
+
+---
+
+## 💡 Recommendation
+
+**For Students/Learning:**
+- **Render**: Best free tier (750 hours/month), easy setup
+- **Railway**: Good trial, modern platform
+- **Azure F1**: Free tier available (with limitations)
+- **Fly.io**: Generous free tier
+
+**For Production:**
+- **Render Starter**: $7/month, always-on, no cold starts
+- **DigitalOcean**: Simple pricing, $5-12/month
+- **Azure B1**: Reliable, good performance, $13/month
+- **Railway**: Modern platform, starting at $5/month
+
+**For Variable Traffic:**
+- **Google Cloud Run**: Pay only for what you use
 
 ## 🔌 API Endpoints
 
@@ -200,7 +402,7 @@ az webapp up --name your-app-name --resource-group your-rg --runtime "PYTHON:3.1
 - **ASGI Server**: Uvicorn with Gunicorn workers
 - **Frontend**: HTML5, CSS3 (Glass Morphism), Vanilla JavaScript
 - **Math Rendering**: MathJax 3
-- **Deployment**: Azure App Service (Free F1), Render (Free)
+- **Deployment**: Render, Azure, DigitalOcean, Railway, Heroku, Google Cloud Run, Fly.io
 - **CI/CD**: GitHub Actions
 - **Version Control**: Git/GitHub
 
@@ -236,8 +438,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - FastAPI for the amazing web framework
 - MathJax for LaTeX rendering support
-- Microsoft Azure for free hosting
-- Render for seamless deployment
+- Render, Azure, and other cloud platforms for making deployment accessible
 
 ## 📞 Support
 
@@ -248,5 +449,5 @@ For issues or questions, please [open an issue](https://github.com/algsoch/html-
 ---
 
 <div align="center">
-Made with ❤️ for the academic community | Deployed on Azure & Render
+Made with ❤️ for the academic community
 </div>
