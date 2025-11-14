@@ -1,18 +1,20 @@
 name: Keep Render Service Alive
 
+# ⚠️ DISABLED - This workflow is currently DISABLED to conserve free tier hours
+# 
 # WARNING: This workflow uses ~360 hours/month of your 750-hour free tier limit
 # 
 # RECOMMENDATIONS:
-# - Free Tier Users: DISABLE this workflow to conserve hours (see RENDER_TROUBLESHOOTING.md)
-# - Paid Tier Users: Keep this ENABLED for best performance
+# - Free Tier Users: Keep this DISABLED to conserve hours
+# - Paid Tier Users: Uncomment the schedule below to keep service alive
 #
-# To disable: Go to Actions tab → Keep Render Service Alive → ... → Disable workflow
+# To re-enable: Uncomment the schedule section below
 
 on:
-  schedule:
-    # Runs every 5 minutes (uses ~12 hours/day = 360 hours/month)
-    - cron: '*/5 * * * *'
-  workflow_dispatch: # Allows manual triggering
+  # schedule:
+  #   # Runs every 5 minutes (uses ~12 hours/day = 360 hours/month)
+  #   - cron: '*/5 * * * *'
+  workflow_dispatch: # Allows manual triggering only
 
 jobs:
   ping:
