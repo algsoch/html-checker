@@ -430,9 +430,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Nishant Pratap Singh**
+**vicky kumar**
 - GitHub: [@algsoch](https://github.com/algsoch)
-- LinkedIn: [Connect with me](https://linkedin.com/in/your-profile)
+- LinkedIn: [Connect with me](https://linkedin.com/in/algsoch)
 
 ## 🙏 Acknowledgments
 
