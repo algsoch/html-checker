@@ -1618,6 +1618,42 @@ h1 {
     box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
 }
 
+/* Citation highlighting in rendered preview */
+.preview-cite-highlight {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 2px solid #ef5350;
+    color: #c62828;
+    font-weight: bold;
+    text-decoration: line-through;
+    text-decoration-color: #d32f2f;
+    text-decoration-thickness: 2px;
+    font-size: 0.9em;
+    display: inline-block;
+    margin: 0 2px;
+    transition: all 0.3s ease;
+    cursor: help;
+    animation: pulseHighlight 2s ease-in-out infinite;
+}
+
+.preview-cite-highlight:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(239, 83, 80, 0.4);
+    animation: none;
+}
+
+@keyframes pulseHighlight {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 0 rgba(239, 83, 80, 0);
+    }
+    50% {
+        opacity: 0.85;
+        box-shadow: 0 0 10px rgba(239, 83, 80, 0.3);
+    }
+}
+
 .arrow-divider {
     display: flex;
     align-items: center;
