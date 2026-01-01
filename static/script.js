@@ -314,9 +314,12 @@ function updateLivePreview(originalHtml, cleanedHtml) {
     const previewSection = document.getElementById('livePreviewSection');
     
     if (beforePreview && afterPreview) {
-        // Render HTML content
+        // Render HTML content with highlighted citations in before preview
         beforePreview.innerHTML = originalHtml;
         afterPreview.innerHTML = cleanedHtml;
+        
+        // Highlight citations in the rendered preview
+        highlightCitationsInPreview(beforePreview);
         
         // Show the preview section
         if (previewSection) {
@@ -330,6 +333,69 @@ function updateLivePreview(originalHtml, cleanedHtml) {
             });
         }
     }
+}
+
+// Highlight citations in the rendered preview
+function highlightCitationsInPreview(element) {
+    if (!element) return;
+    
+    // Get all text nodes
+    const walker = document.createTreeWalker(
+        element,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    );
+    
+    const textNodes = [];
+    let node;
+    while (node = walker.nextNode()) {
+        textNodes.push(node);
+    }
+    
+    // Process each text node
+    textNodes.forEach(textNode => {
+        const text = textNode.textContent;
+        
+        // Check if text contains citations
+        if (text.match(/\[cite(_start|:\s*[\d,\s\-]+)\]/)) {
+            const parent = textNode.parentNode;
+            const fragment = document.createDocumentFragment();
+            let lastIndex = 0;
+            
+            // Match all citation patterns
+            const regex = /\[cite(_start|:\s*[\d,\s\-]+)\]/g;
+            let match;
+            
+            while ((match = regex.exec(text)) !== null) {
+                // Add text before citation
+                if (match.index > lastIndex) {
+                    fragment.appendChild(
+                        document.createTextNode(text.substring(lastIndex, match.index))
+                    );
+                }
+                
+                // Add highlighted citation
+                const span = document.createElement('span');
+                span.className = 'preview-cite-highlight';
+                span.textContent = match[0];
+                span.title = 'This citation will be removed';
+                fragment.appendChild(span);
+                
+                lastIndex = match.index + match[0].length;
+            }
+            
+            // Add remaining text
+            if (lastIndex < text.length) {
+                fragment.appendChild(
+                    document.createTextNode(text.substring(lastIndex))
+                );
+            }
+            
+            // Replace the text node with the fragment
+            parent.replaceChild(fragment, textNode);
+        }
+    });
 }
 
 // Clean HTML content (helper function)
@@ -604,6 +670,20 @@ function resetForm() {
     
     errorMessage.style.display = 'none';
     
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to the input section based on current mode
+    if (currentMode === 'paste') {
+        const pasteSection = document.getElementById('pasteMode');
+        if (pasteSection) {
+            pasteSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Focus on the textarea after scrolling
+            setTimeout(() => {
+                htmlInput.focus();
+            }, 500);
+        }
+    } else {
+        const uploadSection = document.getElementById('uploadMode');
+        if (uploadSection) {
+            uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
 }
