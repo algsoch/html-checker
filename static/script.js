@@ -670,6 +670,20 @@ function resetForm() {
     
     errorMessage.style.display = 'none';
     
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to the input section based on current mode
+    if (currentMode === 'paste') {
+        const pasteSection = document.getElementById('pasteMode');
+        if (pasteSection) {
+            pasteSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Focus on the textarea after scrolling
+            setTimeout(() => {
+                htmlInput.focus();
+            }, 500);
+        }
+    } else {
+        const uploadSection = document.getElementById('uploadMode');
+        if (uploadSection) {
+            uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
 }
