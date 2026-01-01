@@ -1998,3 +1998,66 @@ h1 {
         max-width: 100%;
     }
 }
+
+/* Responsive fix for result-actions in 900px-910px range */
+@media (min-width: 900px) and (max-width: 910px) {
+    .result-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .copy-btn,
+    .download-btn,
+    .select-btn,
+    .copy-rich-btn,
+    .copy-formatted-btn,
+    .another-btn {
+        width: 100%;
+        padding: 10px 16px;
+        font-size: 0.9em;
+    }
+}
+
+/* Responsive fix for result-actions in 910px-950px range */
+@media (min-width: 910px) and (max-width: 950px) {
+    .result-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .copy-btn,
+    .download-btn,
+    .select-btn,
+    .copy-rich-btn,
+    .copy-formatted-btn,
+    .another-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 0.95em;
+    }
+}
+
+/* Notification animations */
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}

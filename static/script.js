@@ -73,6 +73,9 @@ function cleanPastedCode() {
     // Store cleaned content
     cleanedHtmlContent = cleaned;
     
+    // Copy to clipboard automatically
+    copyToClipboard(cleaned);
+    
     // Always update live preview
     updateLivePreview(htmlCode, cleaned);
     
@@ -130,24 +133,34 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Copy cleaned code to clipboard
-function copyCleanedCode() {
-    if (!cleanedHtmlContent) {
-        showError('No cleaned code to copy');
-        return;
+// Helper function to copy text to clipboard
+function copyToClipboard(text, showFeedback = true) {
+    // Try modern clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+            if (showFeedback) {
+                showNotification('✓ Cleaned code copied to clipboard!');
+            }
+        }).catch(err => {
+            console.error('Clipboard API failed:', err);
+            fallbackCopyToClipboard(text, showFeedback);
+        });
+    } else {
+        fallbackCopyToClipboard(text, showFeedback);
     }
-    
-    // Create a temporary textarea
+}
+
+// Fallback copy method for older browsers
+function fallbackCopyToClipboard(text, showFeedback = true) {
     const textarea = document.createElement('textarea');
-    textarea.value = cleanedHtmlContent;
+    textarea.value = text;
     textarea.style.position = 'fixed';
     textarea.style.left = '-9999px';
     textarea.style.top = '0';
     document.body.appendChild(textarea);
     
-    // Select and copy
     textarea.select();
-    textarea.setSelectionRange(0, 99999); // For mobile devices
+    textarea.setSelectionRange(0, 99999);
     
     let success = false;
     try {
@@ -158,12 +171,25 @@ function copyCleanedCode() {
     
     document.body.removeChild(textarea);
     
-    if (success) {
+    if (success && showFeedback) {
+        showNotification('✓ Cleaned code copied to clipboard!');
+    } else if (!success) {
+        showError('Copy failed. Please copy manually.');
+    }
+}
+
+// Copy cleaned code to clipboard
+function copyCleanedCode() {
+    if (!cleanedHtmlContent) {
+        showError('No cleaned code to copy');
+        return;
+    }
+    
+    copyToClipboard(cleanedHtmlContent);
+    
+    // Visual feedback on button
+    if (event && event.target) {
         showCopySuccess(event.target);
-    } else {
-        // If copy fails, select the text in the display area
-        selectCleanedCode();
-        showError('Auto-copy failed. Text selected - press Ctrl+C to copy manually');
     }
 }
 
@@ -214,6 +240,35 @@ function showCopySuccess(btn, message = '✓ Copied!') {
         btn.textContent = originalText;
         btn.style.background = '';
     }, 2000);
+}
+
+// Show notification message
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        background: ${type === 'success' ? 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)' : 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)'};
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        font-weight: 600;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
 }
 
 // Download cleaned code as file
