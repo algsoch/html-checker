@@ -1585,7 +1585,7 @@ h1 {
     word-break: normal;
     overflow-wrap: break-word;
     background: white;
-    line-height: 1.8;
+    line-height: 1.6;
 }
 
 /* Preserve HTML structure in code display */
