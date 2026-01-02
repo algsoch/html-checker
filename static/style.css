@@ -2126,6 +2126,19 @@ h1 {
     }
 }
 
+/* Responsive fix for large screens (above 1100px) */
+@media (min-width: 1100px) {
+    .download-btn,
+    .reset-btn {
+        max-width: 250px;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        padding: 15px 20px;
+        font-size: 0.95em;
+    }
+}
+
 /* Ensure buttons are always clickable and visible */
 .result-actions .copy-btn,
 .result-actions .download-btn,
