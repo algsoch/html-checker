@@ -1576,11 +1576,11 @@ h1 {
 
 .code-display {
     padding: 25px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.95em;
     max-height: 450px;
     overflow-y: auto;
-    white-space: pre-wrap;
+    white-space: normal;
     word-wrap: break-word;
     word-break: normal;
     overflow-wrap: break-word;
@@ -1590,7 +1590,7 @@ h1 {
 
 /* Preserve HTML structure in code display */
 .code-display * {
-    white-space: pre-wrap;
+    white-space: normal;
     word-wrap: break-word;
 }
 
