@@ -91,14 +91,18 @@ function displayVisualization(beforeHtml, afterHtml, totalCitations, citeWithNum
         cite_with_numbers: citeWithNumbers,
         cite_start_markers: citeStart
     };
-    // Highlight citations in before code
-    let highlightedBefore = beforeHtml
-        // Highlight tags containing only cite_start
-        .replace(/<p>\s*\[cite_start\]\s*<\/p>/g, '<span class="highlight-cite">&lt;p&gt;[cite_start]&lt;/p&gt;</span>')
-        .replace(/<div>\s*\[cite_start\]\s*<\/div>/g, '<span class="highlight-cite">&lt;div&gt;[cite_start]&lt;/div&gt;</span>')
-        .replace(/<span>\s*\[cite_start\]\s*<\/span>/g, '<span class="highlight-cite">&lt;span&gt;[cite_start]&lt;/span&gt;</span>')
+    
+    // First escape ALL HTML to show it as text
+    let escapedHtml = escapeHtml(beforeHtml);
+    
+    // Now highlight citations in the escaped HTML
+    let highlightedBefore = escapedHtml
+        // Highlight tags containing only cite_start (already escaped)
+        .replace(/&lt;p&gt;\s*\[cite_start\]\s*&lt;\/p&gt;/g, '<span class="highlight-cite">&lt;p&gt;[cite_start]&lt;/p&gt;</span>')
+        .replace(/&lt;div&gt;\s*\[cite_start\]\s*&lt;\/div&gt;/g, '<span class="highlight-cite">&lt;div&gt;[cite_start]&lt;/div&gt;</span>')
+        .replace(/&lt;span&gt;\s*\[cite_start\]\s*&lt;\/span&gt;/g, '<span class="highlight-cite">&lt;span&gt;[cite_start]&lt;/span&gt;</span>')
         // Highlight cite with numbers (handles commas AND dashes)
-        .replace(/\[cite:\s*[\d,\s\-]+\]/g, match => `<span class="highlight-cite">${escapeHtml(match)}</span>`)
+        .replace(/\[cite:\s*[\d,\s\-]+\]/g, match => `<span class="highlight-cite">${match}</span>`)
         // Highlight remaining cite_start
         .replace(/\[cite_start\]/g, '<span class="highlight-cite">[cite_start]</span>');
     
