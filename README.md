@@ -31,11 +31,7 @@ A powerful web application built with **FastAPI** that intelligently removes cit
 ### Demo Video
 See the tool in action:
 
-<video src="https://github.com/algsoch/html-checker/raw/main/templates/public/images/demo.mov" width="100%" controls>
-  Your browser does not support the video tag.
-</video>
-
-*If video doesn't play, [click here to download](templates/public/images/demo.mov)*
+https://res.cloudinary.com/dsuvhebce/raw/upload/v1759417939/ZYD6eK6y4q8_ln71sk
 
 ### Try it now:
 - **Render**: [https://html-checker-1.onrender.com](https://html-checker-1.onrender.com) ✅ **Primary**
