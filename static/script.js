@@ -91,20 +91,18 @@ function displayVisualization(beforeHtml, afterHtml, totalCitations, citeWithNum
         cite_with_numbers: citeWithNumbers,
         cite_start_markers: citeStart
     };
-    // Highlight citations in before code
+    
+    // Render the HTML (not escaped, so it displays as rendered content)
+    // Highlight citations by wrapping them in spans
     let highlightedBefore = beforeHtml
-        // Highlight tags containing only cite_start
-        .replace(/<p>\s*\[cite_start\]\s*<\/p>/g, '<span class="highlight-cite">&lt;p&gt;[cite_start]&lt;/p&gt;</span>')
-        .replace(/<div>\s*\[cite_start\]\s*<\/div>/g, '<span class="highlight-cite">&lt;div&gt;[cite_start]&lt;/div&gt;</span>')
-        .replace(/<span>\s*\[cite_start\]\s*<\/span>/g, '<span class="highlight-cite">&lt;span&gt;[cite_start]&lt;/span&gt;</span>')
         // Highlight cite with numbers (handles commas AND dashes)
-        .replace(/\[cite:\s*[\d,\s\-]+\]/g, match => `<span class="highlight-cite">${escapeHtml(match)}</span>`)
-        // Highlight remaining cite_start
+        .replace(/\[cite:\s*[\d,\s\-]+\]/g, match => `<span class="highlight-cite">${match}</span>`)
+        // Highlight cite_start
         .replace(/\[cite_start\]/g, '<span class="highlight-cite">[cite_start]</span>');
     
-    // Update before/after displays
+    // Update before/after displays - both render HTML
     document.getElementById('beforeCode').innerHTML = highlightedBefore;
-    document.getElementById('afterCode').textContent = afterHtml;
+    document.getElementById('afterCode').innerHTML = afterHtml;
     
     // Update statistics
     document.getElementById('totalCitations').textContent = stats.total_citations_removed;

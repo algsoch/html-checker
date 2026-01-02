@@ -28,6 +28,11 @@ A powerful web application built with **FastAPI** that intelligently removes cit
 
 ## 🚀 Live Demo
 
+### Demo Video
+See the tool in action:
+
+https://github.com/user-attachments/assets/demo.mov
+
 ### Try it now:
 - **Render**: [https://html-checker-1.onrender.com](https://html-checker-1.onrender.com) ✅ **Primary**
 - **Status**: Running on free tier (may have cold starts after 15 min inactivity)

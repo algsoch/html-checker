@@ -494,7 +494,7 @@ h1 {
     margin-top: 30px;
 }
 
-.download-btn, .another-btn {
+.download-btn, .reset-btn {
     flex: 1;
     padding: 15px;
     border-radius: 8px;
@@ -505,6 +505,9 @@ h1 {
     text-decoration: none;
     display: inline-block;
     border: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .download-btn {
@@ -517,13 +520,16 @@ h1 {
     box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
 }
 
-.another-btn {
+.reset-btn {
     background: white;
     color: #667eea;
     border: 2px solid #667eea;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.another-btn:hover {
+.reset-btn:hover {
     background: #667eea;
     color: white;
     transform: translateY(-2px);
@@ -1570,14 +1576,22 @@ h1 {
 
 .code-display {
     padding: 25px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.95em;
     max-height: 450px;
     overflow-y: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: normal;
+    overflow-wrap: break-word;
     background: white;
-    line-height: 2;
+    line-height: 1.6;
+}
+
+/* Preserve HTML structure in code display */
+.code-display * {
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 .code-display::-webkit-scrollbar {
@@ -1689,7 +1703,7 @@ h1 {
     margin-top: 25px;
 }
 
-.copy-btn, .download-btn, .select-btn, .copy-rich-btn, .copy-formatted-btn, .another-btn {
+.copy-btn, .download-btn, .select-btn, .copy-rich-btn, .copy-formatted-btn, .reset-btn {
     padding: 14px 32px;
     border: none;
     border-radius: 30px;
@@ -1699,7 +1713,9 @@ h1 {
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    white-space: nowrap;
+    text-overflow: clip;
 }
 
 .copy-btn, .download-btn {
@@ -1717,12 +1733,13 @@ h1 {
     color: #333;
 }
 
-.another-btn {
+.reset-btn {
     background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
     color: #333;
+    border: none;
 }
 
-.copy-btn::before, .download-btn::before, .select-btn::before, .copy-rich-btn::before, .copy-formatted-btn::before, .another-btn::before {
+.copy-btn::before, .download-btn::before, .select-btn::before, .copy-rich-btn::before, .copy-formatted-btn::before, .reset-btn::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -1735,12 +1752,12 @@ h1 {
     transition: width 0.5s, height 0.5s;
 }
 
-.copy-btn:hover::before, .download-btn:hover::before, .select-btn:hover::before, .copy-rich-btn:hover::before, .copy-formatted-btn:hover::before, .another-btn:hover::before {
+.copy-btn:hover::before, .download-btn:hover::before, .select-btn:hover::before, .copy-rich-btn:hover::before, .copy-formatted-btn:hover::before, .reset-btn:hover::before {
     width: 300px;
     height: 300px;
 }
 
-.copy-btn:hover, .download-btn:hover, .copy-rich-btn:hover, .copy-formatted-btn:hover, .another-btn:hover {
+.copy-btn:hover, .download-btn:hover, .copy-rich-btn:hover, .copy-formatted-btn:hover, .reset-btn:hover {
     transform: translateY(-3px) scale(1.05);
     box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
 }
@@ -1755,7 +1772,7 @@ h1 {
     box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);
 }
 
-.copy-btn:active, .download-btn:active, .select-btn:active, .copy-rich-btn:active, .copy-formatted-btn:active, .another-btn:active {
+.copy-btn:active, .download-btn:active, .select-btn:active, .copy-rich-btn:active, .copy-formatted-btn:active, .reset-btn:active {
     transform: translateY(-1px) scale(1.02);
 }
 
@@ -1895,6 +1912,7 @@ h1 {
 
     .action-buttons,
     .result-actions {
+        display: flex !important;
         flex-direction: column;
         gap: 12px;
     }
@@ -1904,9 +1922,13 @@ h1 {
     .select-btn,
     .copy-rich-btn,
     .copy-formatted-btn,
-    .another-btn {
+    .reset-btn {
         width: 100%;
-        padding: 15px;
+        padding: 16px;
+        font-size: 1em;
+        min-height: 48px;
+        display: block;
+        white-space: normal;
     }
 
     .demo-code {
@@ -2038,7 +2060,7 @@ h1 {
 /* Responsive fix for result-actions in 900px-910px range */
 @media (min-width: 900px) and (max-width: 910px) {
     .result-actions {
-        display: grid;
+        display: grid !important;
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
     }
@@ -2048,17 +2070,20 @@ h1 {
     .select-btn,
     .copy-rich-btn,
     .copy-formatted-btn,
-    .another-btn {
+    .reset-btn {
         width: 100%;
         padding: 10px 16px;
-        font-size: 0.9em;
+        font-size: 0.85em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 
 /* Responsive fix for result-actions in 910px-950px range */
 @media (min-width: 910px) and (max-width: 950px) {
     .result-actions {
-        display: grid;
+        display: grid !important;
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
@@ -2068,10 +2093,77 @@ h1 {
     .select-btn,
     .copy-rich-btn,
     .copy-formatted-btn,
-    .another-btn {
+    .reset-btn {
         width: 100%;
         padding: 12px 20px;
+        font-size: 0.9em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Responsive fix for result-actions in 950px-1100px range */
+@media (min-width: 950px) and (max-width: 1100px) {
+    .result-actions {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+    
+    .copy-btn,
+    .download-btn,
+    .select-btn,
+    .copy-rich-btn,
+    .copy-formatted-btn,
+    .reset-btn {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 0.85em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Responsive fix for large screens (above 1100px) */
+@media (min-width: 1100px) {
+    .download-btn,
+    .reset-btn {
+        max-width: 250px;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        padding: 15px 20px;
         font-size: 0.95em;
+    }
+}
+
+/* Ensure buttons are always clickable and visible */
+.result-actions .copy-btn,
+.result-actions .download-btn,
+.result-actions .select-btn,
+.result-actions .copy-rich-btn,
+.result-actions .copy-formatted-btn,
+.result-actions .reset-btn {
+    min-width: 120px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Fix for touch devices */
+@media (hover: none) and (pointer: coarse) {
+    .result-actions .copy-btn,
+    .result-actions .download-btn,
+    .result-actions .select-btn,
+    .result-actions .copy-rich-btn,
+    .result-actions .copy-formatted-btn,
+    .result-actions .reset-btn {
+        padding: 16px 24px;
+        font-size: 1em;
+        min-height: 48px;
     }
 }
 
