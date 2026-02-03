@@ -332,8 +332,6 @@ Serverless deployment with pay-per-use pricing.
 | **Railway** | $5/month | 500 hours/mo | No | Modern development |
 | **Heroku** | $7/month | No (removed) | No | Quick deployment |
 | **Google Cloud Run** | Pay-per-use | 2M req/month | Yes | Serverless, variable traffic |
-| **Fly.io** | $1.94/month | Limited | No | Global deployment |
-
 ---
 
 ## 💡 Recommendation
