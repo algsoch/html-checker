@@ -322,24 +322,6 @@ Serverless deployment with pay-per-use pricing.
 
 ---
 
-### Deploy to Fly.io
-
-Modern platform with global deployment.
-
-**Deployment Steps:**
-1. Install [Fly CLI](https://fly.io/docs/hands-on/install-flyctl/)
-2. Deploy:
-   ```bash
-   fly launch
-   fly deploy
-   ```
-
-**Fly.io Pricing:**
-- **Free**: 3 shared-cpu-1x VMs with 256MB RAM
-- **Paid**: Starting at $1.94/month per VM
-
----
-
 ## 🎯 Deployment Comparison
 
 | Platform | Entry Price | Free Tier | Auto-Sleep | Best For |
@@ -452,7 +434,3 @@ If you found this project helpful, please give it a ⭐️!
 For issues or questions, please [open an issue](https://github.com/algsoch/html-checker/issues).
 
 ---
-
-<div align="center">
-Made with ❤️ for the academic community
-</div>
