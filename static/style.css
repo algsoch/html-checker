@@ -114,6 +114,9 @@ body {
 .header-icon {
     margin-bottom: 20px;
     animation: bounceIn 1s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 @keyframes bounceIn {
@@ -131,6 +134,9 @@ body {
 .logo-icon {
     width: 80px;
     height: 80px;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
     filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.3));
     animation: pulse-icon 3s infinite;
 }
