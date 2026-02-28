@@ -31,7 +31,7 @@ A powerful web application built with **FastAPI** that intelligently removes cit
 ### Demo Video
 See the tool in action:
 
-https://res.cloudinary.com/dsuvhebce/raw/upload/v1759417939/ZYD6eK6y4q8_ln71sk
+[![Demo Video](https://img.youtube.com/vi/vDBb2l6yApE/0.jpg)](https://youtu.be/vDBb2l6yApE)
 
 ### Try it now:
 - **Render**: [https://html-checker-1.onrender.com](https://html-checker-1.onrender.com) ✅ **Primary**
